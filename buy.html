@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BorrowBuddy – Borrow an Item</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background-color: #1a202c;
+      color: #fff;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(26, 32, 44, 0.95);
+      border-bottom: 1px solid #2d3748;
+      backdrop-filter: blur(8px);
+      height: 4rem;
+    }
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+    .logo span {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #fff;
+      text-decoration: none;
+      transition: color 150ms;
+    }
+    .nav-links a:hover {
+      color: #fbbf24;
+    }
+    h1 {
+      text-align: center;
+      margin: 2rem 0;
+      font-size: 2rem;
+      color: #fbbf24;
+    }
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+      gap: 1.5rem;
+      padding-bottom: 2rem;
+    }
+    .item-card {
+      background-color: #1e293b;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: transform 0.2s;
+    }
+    .item-card:hover {
+      transform: translateY(-4px);
+    }
+    .item-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .item-details {
+      padding: 1rem;
+    }
+    .item-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fbbf24;
+      margin-bottom: 0.5rem;
+    }
+    .item-description {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      margin-bottom: 1rem;
+    }
+    .item-price {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #22c55e;
+      margin-bottom: 0.75rem;
+    }
+    .borrow-button {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #fbbf24;
+      color: #1a202c;
+      border-radius: 9999px;
+      font-weight: 500;
+      text-align: center;
+      text-decoration: none;
+      transition: background-color 150ms;
+    }
+    .borrow-button:hover {
+      background-color: #d97706;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo"><span>BorrowBuddy</span></div>
+      <nav class="nav-links">
+        <a href="{{ url_for('how_it_works') }}">How It Works</a>
+        <a href="{{ url_for('signup') }}">Signup</a>
+        <a href="{{ url_for('login') }}">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <h1>Available Items to Borrow</h1>
+
+  <div class="container">
+    <div class="items-grid" id="items-container">
+      <!-- JS will inject .item-card elements here -->
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9x2jEzgZPFHTt6lcd0sWXIFdyf5zMnW8",
+      authDomain: "borrowbuddy-7ebe6.firebaseapp.com",
+      projectId: "borrowbuddy-7ebe6",
+      storageBucket: "borrowbuddy-7ebe6.appspot.com",
+      messagingSenderId: "503655511550",
+      appId: "1:503655511550:web:c00dce8d3cd4914bc0bcaf"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadItems() {
+      const container = document.getElementById("items-container");
+      const snapshot = await getDocs(collection(db, "items"));
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const card = document.createElement("div");
+        card.className = "item-card";
+        card.innerHTML = `
+          <a href="/item/${doc.id}" style="text-decoration: none; color: inherit;">
+            <img src="${data.image_url}" alt="${data.title}" />
+            <div class="item-details">
+              <div class="item-title">${data.title}</div>
+              <div class="item-description">${data.description}</div>
+              <div class="item-price">₹${data.price_per_day} / day</div>
+              <div class="borrow-button">Know More</div>
+            </div>
+          </a>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    loadItems();
+  </script>
+
+</body>
+</html>

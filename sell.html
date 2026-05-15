@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>List Your Item – BorrowBuddy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #1a202c; color: #fff;
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh;
+    }
+    .container {
+      background: #1e293b; padding:2rem;
+      border-radius:10px; box-shadow:0 8px 16px rgba(0,0,0,0.6);
+      max-width:800px; width:100%;
+    }
+    header {
+      font-size:2rem; font-weight:600; color:#fbbf24;
+      text-align:center; margin-bottom:1.5rem;
+    }
+    form { display:flex; flex-direction:column; }
+    label {
+      margin-top:1rem; margin-bottom:0.5rem;
+      font-weight:500; color:#fbbf24;
+    }
+    input, textarea, select {
+      padding:0.75rem; border-radius:5px;
+      border:1px solid #4a5568; background:#2d3748;
+      color:#fff; font-size:1rem;
+      transition:border-color 0.2s,box-shadow 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline:none; border-color:#38b2ac;
+      box-shadow:0 0 5px rgba(56,178,172,0.5);
+    }
+    #other-category {
+      display: none;
+    }
+    button {
+      margin-top:1.5rem; padding:0.75rem;
+      background:#fbbf24; color:#1a202c;
+      font-size:1.125rem; font-weight:600;
+      border:none; border-radius:5px; cursor:pointer;
+      transition:background 0.2s;
+    }
+    button:hover { background:#d97706; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>List Your Item for Rent</header>
+    <form id="sell-form" method="POST" action="/sell" enctype="multipart/form-data">
+      <input type="hidden" name="owner_email" id="owner_email" />
+
+      <label for="title">Item Title</label>
+      <input type="text" id="title" name="title" placeholder="e.g., DSLR Camera" required />
+
+      <label for="category">Category</label>
+      <select id="category" name="category" required>
+        <option value="">Select a category</option>
+        <option value="electronics">Electronics</option>
+        <option value="furniture">Furniture</option>
+        <option value="vehicles">Vehicles</option>
+        <option value="books">Books</option>
+        <option value="tools">Tools</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="other-category">Please specify</label>
+      <input type="text" id="other-category" name="other_category" placeholder="Enter your category" />
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="4" placeholder="Provide a detailed description" required></textarea>
+
+      <label for="price">Price (₹ per day)</label>
+      <input type="number" id="price" name="price" min="1" placeholder="Enter price per day" required />
+
+      <label for="image">Upload Image</label>
+      <input type="file" id="image" name="image" accept="image/*" required />
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" placeholder="Enter city or locality" required />
+
+      <label for="phone">Contact Number</label>
+      <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="e.g. 9876543210" required />
+
+      <button type="submit">Post Listing</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9x2jEzgZPFHTt6lcd0sWXIFdyf5zMnW8",
+      authDomain: "borrowbuddy-7ebe6.firebaseapp.com",
+      projectId: "borrowbuddy-7ebe6",
+      storageBucket: "borrowbuddy-7ebe6.appspot.com",
+      messagingSenderId: "503655511550",
+      appId: "1:503655511550:web:c00dce8d3cd4914bc0bcaf"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, user => {
+      if (!user) window.location.href = "/login";
+      else document.getElementById("owner_email").value = user.email;
+    });
+
+    const catSelect = document.getElementById('category');
+    const otherInput = document.getElementById('other-category');
+    catSelect.addEventListener('change', () => {
+      const isOther = catSelect.value === 'other';
+      otherInput.style.display = isOther ? 'block' : 'none';
+      otherInput.required = isOther;
+      if (!isOther) otherInput.value = '';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ item.title }} – BorrowBuddy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0; padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background: #111827; color: #fff;
+    }
+    .container {
+      max-width: 800px; margin: auto;
+      background: #1e293b; padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    img {
+      max-width: 100%; border-radius: 8px; margin-bottom: 1rem;
+    }
+    h1 { font-size: 2rem; color: #fbbf24; margin-bottom: 0.5rem; }
+    .meta { color: #9ca3af; margin-bottom: 1rem; }
+    p { line-height: 1.6; margin-bottom: 1rem; }
+    .contact-box {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #374151;
+      border-radius: 8px;
+    }
+    .copy-btn {
+      background: #10b981;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .copy-btn:hover {
+      background: #059669;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="{{ item.image_url }}" alt="Item image">
+  <h1>{{ item.title }}</h1>
+  <div class="meta">
+    Category: {{ item.category }} | ₹{{ item.price_per_day }} / day  
+  </div>
+  <p><strong>Location:</strong> {{ item.location }}</p>
+  <p><strong>Description:</strong> {{ item.description }}</p>
+  <p><strong>Listed by:</strong> {{ item.owner_email }}</p>
+
+  <!-- Contact Info (shown after login) -->
+  <div class="contact-box" id="contact-info" style="display: none;">
+    <p><strong>Owner’s WhatsApp Number:</strong> <span id="phone-display">+91 {{ item.phone }}</span></p>
+    <button class="copy-btn" onclick="copyPhone()">📋 Copy Number</button>
+    <p style="color:#9ca3af;">Open WhatsApp on your phone and message this number to discuss the rental.</p>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9x2jEzgZPFHTt6lcd0sWXIFdyf5zMnW8",
+    authDomain: "borrowbuddy-7ebe6.firebaseapp.com",
+    projectId: "borrowbuddy-7ebe6",
+    storageBucket: "borrowbuddy-7ebe6.appspot.com",
+    messagingSenderId: "503655511550",
+    appId: "1:503655511550:web:c00dce8d3cd4914bc0bcaf"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      alert("You must be logged in to view contact details.");
+      window.location.href = "/login";
+    } else {
+      document.getElementById("contact-info").style.display = "block";
+    }
+  });
+
+  window.copyPhone = () => {
+    const phone = document.getElementById("phone-display").textContent.trim();
+    navigator.clipboard.writeText(phone);
+    alert("Owner's number copied to clipboard!");
+  };
+</script>
+
+</body>
+</html>

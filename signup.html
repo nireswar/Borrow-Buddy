@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>BorrowBuddy – Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      position: relative;
+      background: #111827;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .home-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #3b82f6;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 150ms;
+    }
+    .home-button:hover { background: #2563EB; }
+
+    .container {
+      background: #1f2937;
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+    .error {
+      color: #f87171;
+      margin-bottom: 1rem;
+      font-weight: 500;
+      min-height: 1.2em;
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 8px;
+      background: #374151;
+      color: #fff;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      background: #3b82f6;
+      padding: 0.75rem;
+      margin-top: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    button:hover { background: #2563EB; }
+    .login-link {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .login-link a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="{{ url_for('index') }}" class="home-button">Home</a>
+
+  <div class="container">
+    <h2>Create your BorrowBuddy account</h2>
+    <div id="error-msg" class="error"></div>
+
+    <input id="email" type="email" placeholder="Email address" />
+    <input id="password" type="password" placeholder="Password" />
+    <input id="confirm-password" type="password" placeholder="Confirm password" />
+    <button id="signup-btn" type="button">Sign Up</button>
+
+    <div class="login-link">
+      Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9x2jEzgZPFHTt6lcd0sWXIFdyf5zMnW8",
+      authDomain: "borrowbuddy-7ebe6.firebaseapp.com",
+      projectId: "borrowbuddy-7ebe6",
+      storageBucket: "borrowbuddy-7ebe6.appspot.com",
+      messagingSenderId: "503655511550",
+      appId: "1:503655511550:web:c00dce8d3cd4914bc0bcaf"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const setError = msg => {
+      document.getElementById('error-msg').textContent = msg;
+    };
+
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      setError('');
+      const email = document.getElementById('email').value.trim();
+      const pwd = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm-password').value;
+
+      if (!email) return setError('Please enter your email.');
+      if (pwd.length < 6) return setError('Password must be at least 6 characters.');
+      if (pwd !== confirm) return setError('Passwords do not match.');
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, pwd);
+        // ✅ New account → redirect to home
+        window.location.href = "/";
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') {
+          // ⚠️ Account exists → show message then redirect to login
+          setError('Email already in use. Redirecting to login...');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 1500);
+        } else {
+          setError(err.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
